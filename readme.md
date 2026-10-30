@@ -917,6 +917,23 @@ Since the GitHub API only allows 5k requests per hour, my `https://github-readme
 
 </details>
 
+#### Troubleshooting self-hosted rate limits
+
+If your own Vercel deployment still shows `Downtime due to GitHub API rate limiting`, the most common causes are:
+
+1. Missing or invalid PAT in Vercel (`PAT_1` not set, expired, or revoked).
+2. Environment variable changes were made, but the project was not redeployed.
+3. Token permissions are too narrow for your setup (especially when including private stats).
+4. High request volume (multiple cards, frequent README/profile traffic, or multiple consumers using the same deployment).
+
+Recommended fixes:
+
+* Confirm `PAT_1` is present in Vercel **Production** environment and redeploy.
+* Rotate/regenerate PATs if needed, then redeploy.
+* Add additional tokens as `PAT_2`, `PAT_3`, etc. to increase available hourly quota.
+* Increase cache duration with `CACHE_SECONDS` to reduce API calls.
+* For maximum stability, consider the GitHub Actions mode to generate static SVGs.
+
 ### On other platforms
 
 > [!WARNING]
@@ -947,6 +964,11 @@ GitHub Readme Stats provides several environment variables that can be used to c
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td><code>PAT_1</code>, <code>PAT_2</code>, ...</td>
+      <td>GitHub Personal Access Tokens used for GitHub API requests. Multiple PATs can be configured and are retried sequentially when one token is rate-limited or invalid.</td>
+      <td>Valid GitHub PAT strings (classic or fine-grained)</td>
+    </tr>
     <tr>
       <td><code>CACHE_SECONDS</code></td>
       <td>Sets the cache duration in seconds for the generated cards. This variable takes precedence over the default cache timings for the public instance. If this variable is not set, the default cache duration is 24 hours (86,400 seconds).</td>
